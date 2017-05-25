@@ -1,5 +1,7 @@
 package de.baspla.planbot;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -20,6 +22,9 @@ import java.io.*;
  * Created by Mew on 22.05.2017.
  */
 public class Main {
+
+	private static Log LOG = LogFactory.getLog(Main.class.getName());
+
 	public static void main(String[] args) {
 
 		ApiContextInitializer.init();
@@ -29,15 +34,16 @@ public class Main {
 		Settings s = new Settings();
 
 		try {
-			botsApi.registerBot(
-					new TheBot(s.getBotname(), s.getBottoken(), s.getName(), s.getPasswort(), s.getKlasse()));
+			TheBot bot = new TheBot(s.getBotname(), s.getBottoken(), s.getName(), s.getPasswort(), s.getKlasse());
+			botsApi.registerBot(bot);
+			bot.start();
 		} catch (TelegramApiException e) {
-			e.printStackTrace();
+			LOG.error(e);
 		}
 	}
 
 	public static String connect(String url, String name, String pw) {
-
+		
 		try {
 			UnsafeSSLHelp unsafeSSLHelp = new UnsafeSSLHelp();
 			CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -56,7 +62,7 @@ public class Main {
 				HttpEntity entity1 = response.getEntity();
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 				entity1.writeTo(outputStream);
-				content = outputStream.toString();
+				content = outputStream.toString("UTF-8");
 				EntityUtils.consume(entity1);
 			} finally {
 				response.close();
