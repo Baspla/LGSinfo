@@ -4,4 +4,4 @@ before_script:
   - apt-get --quiet update --yes
 
 build:
-  script: "mvn clean package -B"
+  script: "mvn clean package -B -Dfile.encoding=CP1252"
