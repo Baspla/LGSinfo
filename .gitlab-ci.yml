@@ -2,7 +2,7 @@ image: maven:3-jdk-8
 
 before_script:
   - apt-get --quiet update --yes
-  - apt-get --quiet install openssh-client scp --yes
+  - apt-get --quiet install openssh-client --yes
 
 build:
   script: "mvn package -B"
