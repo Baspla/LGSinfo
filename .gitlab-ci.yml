@@ -8,4 +8,4 @@ build:
   script: "mvn package -B"
 
 deploy:
-  script: "scp target/telegram-plan.1.0-SNAPSHOT.jar $sshUser@$sshPassword:/home/$sshUser/."
+  script: "mvn clean package -B && scp target/telegram-plan.1.0-SNAPSHOT.jar $sshUser@$sshPassword:/home/$sshUser/."
