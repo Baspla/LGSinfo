@@ -11,7 +11,8 @@ build:
 deploy:
   script:
    - mvn clean package -B
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'rm ~/telegram-plan-1.0-SNAPSHOT.jar'
    - sshpass -p $password scp -o StrictHostKeyChecking=no target/telegram-plan-1.0-SNAPSHOT.jar $user@$hostname:~/.
-   - echo $password | ssh $user@$hostname 'pkill telegram-plan'
-   - echo $password | ssh $user@$hostname 'java -jar telegram-plan-1.0-SNAPSHOT.jar&'
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'pkill telegram-plan'
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'java -jar telegram-plan-1.0-SNAPSHOT.jar&'
 
