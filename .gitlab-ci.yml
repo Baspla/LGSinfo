@@ -4,11 +4,6 @@ before_script:
   - apt-get --quiet update --yes
   - apt-get --quiet install openssh-client sshpass --yes
 
-stages:
-  - build
-  - deploy
-  - exec
-
 build:
   script:
    - mvn package -B
@@ -18,6 +13,3 @@ deploy:
    - mvn clean package -B
    - sshpass -p $password scp -o StrictHostKeyChecking=no target/telegram-plan-1.0-SNAPSHOT.jar $user@$hostname:~/.
 
-
-exec:
-   - echo TODO
