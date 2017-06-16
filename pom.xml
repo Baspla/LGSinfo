@@ -13,7 +13,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>fully.qualified.MainClass</mainClass>
+							<mainClass>de.baspla.planbot.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
