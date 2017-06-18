@@ -2,6 +2,15 @@ image: maven:3-jdk-8
 
 before_script:
   - apt-get --quiet update --yes
+  - apt-get --quiet install openssh-client sshpass --yes
 
 build:
-  script: "mvn clean package -B -Dfile.encoding=CP1252"
+  script:
+   - mvn package -B
+
+deploy:
+  script:
+   - mvn clean package -B
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'rm ~/telegram-plan-1.0-SNAPSHOT.jar'
+   - sshpass -p $password scp -o StrictHostKeyChecking=no target/telegram-plan-1.0-SNAPSHOT.jar $user@$hostname:~/.
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname '~/reload.sh'
