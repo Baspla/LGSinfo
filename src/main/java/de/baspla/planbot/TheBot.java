@@ -308,6 +308,7 @@ public class TheBot extends TelegramLongPollingBot {
 		ArrayList<Eintrag> plan = getPlan();
 		if (plan == null) {
 			LOG.error("Update hat keinen Plan erhalten");
+			return;
 		}
 		for (Eintrag e : plan) {
 			if (!inside(eintraege, e)) {
