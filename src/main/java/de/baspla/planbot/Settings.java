@@ -17,7 +17,10 @@ public class Settings {
 		properties.setProperty("bottoken", "");
 		properties.setProperty("name", "");
 		properties.setProperty("passwort", "");
-		properties.setProperty("klasse", "12BG");
+		properties.setProperty("captcha", "true");
+        properties.setProperty("admin", "");
+        properties.setProperty("interval", "1800000");
+		properties.setProperty("klasse", "13BG");
 		try {
 			InputStream input = new FileInputStream("config.properties");
 			properties.load(input);
@@ -48,10 +51,33 @@ public class Settings {
 	}
 
 	public String getPasswort() {
-		return properties.getProperty("passwort");
-	}
-
+        return properties.getProperty("passwort");
+    }
+    public String getAdmin() {
+        return properties.getProperty("admin");
+    }
+    public String getCaptcha() {
+        return properties.getProperty("captcha");
+    }
+    public String getInterval() {
+        return properties.getProperty("captcha");
+    }
 	public Properties getProperties() {
 		return properties;
 	}
+
+    public void setAdmin(long admin) {
+	    properties.setProperty("admin",new Long(admin).toString());
+        try {
+            InputStream input = new FileInputStream("config.properties");
+            properties.load(input);
+        } catch (IOException e) {
+            try {
+                OutputStream outputStream = new FileOutputStream("config.properties");
+                properties.store(outputStream, "LGSBot");
+            } catch (IOException e1) {
+                System.exit(-1);
+            }
+        }
+    }
 }

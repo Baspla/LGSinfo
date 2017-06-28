@@ -34,7 +34,7 @@ public class Main {
 		Settings s = new Settings();
 
 		try {
-			TheBot bot = new TheBot(s.getBotname(), s.getBottoken(), s.getName(), s.getPasswort(), s.getKlasse());
+			TheBot bot = new TheBot(s.getBotname(), s.getBottoken(), s.getName(), s.getPasswort(), s.getKlasse(),s.getCaptcha(),s.getAdmin(),s.getInterval(),s);
 			botsApi.registerBot(bot);
 			bot.start();
 		} catch (TelegramApiException e) {
