@@ -68,7 +68,7 @@ public class TheBot extends TelegramLongPollingBot {
         this.uname = uname;
         this.klasse = klasse;
         try{
-            this.interval = new Long(interval);}catch(NumberFormatException e){System.exit(55);}
+            this.interval = new Long(interval);}catch(NumberFormatException e){LOG.error("INTERVAL ERROR");this.interval=700000;}
         try{
         this.ADMIN = new Long(admin);}catch(NumberFormatException e){}
         this.s=s;
