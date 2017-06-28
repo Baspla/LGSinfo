@@ -29,6 +29,8 @@ public class Settings {
 				OutputStream outputStream = new FileOutputStream("config.properties");
 				properties.store(outputStream, "LGSBot");
 			} catch (IOException e1) {
+			    e.printStackTrace();
+			    System.err.println("SCHREIBFEHLER");
 				System.exit(-1);
 			}
 		}
