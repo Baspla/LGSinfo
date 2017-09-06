@@ -13,4 +13,4 @@ deploy:
    - mvn clean package -B
    - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'rm ~/telegram-plan-1.0-SNAPSHOT.jar'
    - sshpass -p $password scp -o StrictHostKeyChecking=no target/telegram-plan-1.0-SNAPSHOT.jar $user@$hostname:~/.
-   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname '~/./reloadplan.sh'
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'sudo ~/reloadplan.sh'
