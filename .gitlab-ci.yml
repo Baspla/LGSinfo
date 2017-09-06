@@ -11,6 +11,6 @@ build:
 deploy:
   script:
    - mvn clean package -B
-   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'rm ~/plam.jar'
+   - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname 'rm ~/plan.jar'
    - sshpass -p $password scp -o StrictHostKeyChecking=no target/plan.jar $user@$hostname:~/.
    - sshpass -p $password ssh -o StrictHostKeyChecking=no $user@$hostname '~/reloadplan.sh'
