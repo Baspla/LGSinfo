@@ -1,5 +1,6 @@
 package de.baspla.planbot;
 
+import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -7,14 +8,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.IndexTreeList;
-import org.mapdb.Serializer;
+import org.mapdb.*;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChat;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -22,13 +18,8 @@ import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
-import com.vdurmont.emoji.EmojiParser;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,8 +29,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.imageio.ImageIO;
 
 /**
  * Created by Mew on 22.05.2017.
@@ -108,7 +97,13 @@ public class TheBot extends TelegramLongPollingBot {
                 // NACHRICHTEN
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/moin")) {
+            String txt = update.getMessage().getText();
+            if(update.getMessage().isGroupMessage()||update.getMessage().isGroupMessage()){
+                if(update.getMessage().getText().toLowerCase().endsWith("@lgsbot")){
+                    txt = update.getMessage().getText().toLowerCase().replace("@lgsbot","");
+                }
+            }
+            if (txt.equalsIgnoreCase("/moin")) {
                 if (isuser(update.getMessage().getChatId())) {
                     send(update.getMessage().getChatId(), "<b>Moin!</b> Du bist schon dabei.");
                     return;
@@ -128,7 +123,7 @@ public class TheBot extends TelegramLongPollingBot {
 
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/bye")) {
+            if (txt.equalsIgnoreCase("/bye")) {
                 if (isuser(update.getMessage().getChatId())) {
 
                     send(update.getMessage().getChatId(), "Wenn du mich wirklich verlassen willst benutze /byebye");
@@ -137,7 +132,7 @@ public class TheBot extends TelegramLongPollingBot {
                 send(update.getMessage().getChatId(), "<i>Wer bist du?</i>");
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/byebye")) {
+            if (txt.equalsIgnoreCase("/byebye")) {
                 if (isuser(update.getMessage().getChatId())) {
 
                     removeUser(update.getMessage().getChatId());
@@ -148,7 +143,7 @@ public class TheBot extends TelegramLongPollingBot {
                 send(update.getMessage().getChatId(), "<i>Wer bist du?</i>");
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/start")) {
+            if (txt.equalsIgnoreCase("/start")) {
                 if (!isuser(update.getMessage().getChatId())) {
                     send(update.getMessage().getChatId(), "<b>Moin!</b> Melde dich mit /moin an.");
                     return;
@@ -156,12 +151,12 @@ public class TheBot extends TelegramLongPollingBot {
                 rkey(update.getMessage().getChatId(), "<b>Moin!</b>", new ReplyKeyboardRemove());
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/alles")) {
+            if (txt.equalsIgnoreCase("/alles")) {
                 send(update.getMessage().getChatId(), "Die aktuellen Vertretungen.");
                 allon(update.getMessage().getChatId());
                 return;
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/reload")) {
+            if (txt.equalsIgnoreCase("/reload")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     eintraege.clear();
                     for (Long id : map) {
@@ -171,14 +166,14 @@ public class TheBot extends TelegramLongPollingBot {
                 }
 
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/refresh")) {
+            if (txt.equalsIgnoreCase("/refresh")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     update();
                     send(update.getMessage().getChatId(), "Update...");
                     return;
                 }
 
-            }if (update.getMessage().getText().equalsIgnoreCase("/admin")) {
+            }if (txt.equalsIgnoreCase("/admin")) {
                 if (update.getMessage().getChat().getUserName() == "TimMorgner") {
                     ADMIN=update.getMessage().getChatId();
                     s.setAdmin(ADMIN);
@@ -186,7 +181,7 @@ public class TheBot extends TelegramLongPollingBot {
                 }
 
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/notify")) {
+            if (txt.equalsIgnoreCase("/notify")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     notify=!notify;
                     send(update.getMessage().getChatId(), "Notify: "+notify);
@@ -194,7 +189,7 @@ public class TheBot extends TelegramLongPollingBot {
                 }
 
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/stop")) {
+            if (txt.equalsIgnoreCase("/stop")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     send(update.getMessage().getChatId(), "Goodbye!");
                     close();
@@ -215,7 +210,7 @@ public class TheBot extends TelegramLongPollingBot {
                     return;
                 }
             }
-            if (update.getMessage().getText().equalsIgnoreCase("/list")) {
+            if (txt.equalsIgnoreCase("/list")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     for (Long lo : map) {
                         Chat c = null;
