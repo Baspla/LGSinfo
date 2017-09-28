@@ -4,6 +4,7 @@ import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -37,11 +38,11 @@ public class TheBot extends TelegramLongPollingBot {
     private final String name;
     private final String token;
     private long interval ;
-    final IndexTreeList<String> eintraege;
+    private final IndexTreeList<String> eintraege;
     private final Settings s;
-    private boolean boolcaptcha , notify;
+    private boolean notify;
     private Timer t;
-    IndexTreeList<Long> map;
+    private IndexTreeList<Long> map;
     private DB db;
     private long ADMIN;
     private String uname, pw;
@@ -49,7 +50,7 @@ public class TheBot extends TelegramLongPollingBot {
     private HTreeMap<Long, String> captcha;
     private static Log LOG = LogFactory.getLog(TheBot.class.getName());
 
-    public TheBot(String name, String token, String uname, String pw, String klasse, String captcha, String admin,String interval, Settings s) {
+    TheBot(String name, String token, String uname, String pw, String klasse, String captcha, String admin, String interval, Settings s) {
         LOG.info("Bot gestartet");
         this.name = name;
         this.token = token;
@@ -59,16 +60,17 @@ public class TheBot extends TelegramLongPollingBot {
         try{
             this.interval = new Long(interval);}catch(NumberFormatException e){LOG.error("INTERVAL ERROR");this.interval=700000;}
         try{
-        this.ADMIN = new Long(admin);}catch(NumberFormatException e){}
+        this.ADMIN = new Long(admin);}catch(NumberFormatException e){e.printStackTrace();}
         this.s=s;
-        this.boolcaptcha = captcha.equals("true");
+        @SuppressWarnings("unused")
+        boolean boolcaptcha = captcha.equals("true");
         db = DBMaker.fileDB("daten.bank").closeOnJvmShutdown().checksumHeaderBypass().make();
         map = db.indexTreeList("schueler", Serializer.LONG).createOrOpen();
         this.captcha = db.hashMap("captcha", Serializer.LONG, Serializer.STRING).createOrOpen();
         eintraege = db.indexTreeList("eintraege", Serializer.STRING).createOrOpen();
     }
 
-    public void start() {
+    void start() {
         t = new Timer();
         t.schedule(new TimerTask() {
             @Override
@@ -172,7 +174,7 @@ public class TheBot extends TelegramLongPollingBot {
                 }
 
             }if (txt.equalsIgnoreCase("/admin")) {
-                if (update.getMessage().getChat().getUserName() == "TimMorgner") {
+                if (update.getMessage().getChat().getUserName().equalsIgnoreCase("TimMorgner")) {
                     ADMIN=update.getMessage().getChatId();
                     s.setAdmin(ADMIN);
                     return;
@@ -211,12 +213,12 @@ public class TheBot extends TelegramLongPollingBot {
             if (txt.equalsIgnoreCase("/list")) {
                 if (update.getMessage().getChatId() == ADMIN) {
                     for (Long lo : map) {
-                        Chat c = null;
+                        Chat c;
                         try {
                             c = sendApiMethod(new GetChat().setChatId(lo));
                             send(update.getMessage().getChatId(), lo + "  " + c.getFirstName() + " " + c.getLastName()
                                     + " @" + c.getUserName() + " Gruppe:" + c.getTitle());
-                        } catch (TelegramApiException e) {
+                        } catch (TelegramApiException ignored) {
                         }
 
                     }
@@ -224,10 +226,9 @@ public class TheBot extends TelegramLongPollingBot {
                 }
             }
             send(update.getMessage().getChatId(), "Diesen Befehl gibt es nicht.");
-            return;
         }
     }
-
+    @SuppressWarnings("unused")
     private InputStream newCaptcha(Long chatId) {
         BufferedImage image = new BufferedImage(600, 300, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -269,10 +270,10 @@ public class TheBot extends TelegramLongPollingBot {
         return fis;
     }
 
-    public void send(long id, String s) {
+    private void send(long id, String s) {
         if (s == null)
             return;
-        if (s == "")
+        if (s.isEmpty())
             return;
         if (s.length() > 4000) {
             send(id, s.substring(0, 4000));
@@ -287,12 +288,12 @@ public class TheBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-
-    public void key(long id, String s, InlineKeyboardMarkup inlineKeyboardMarkup) {
+    @SuppressWarnings("unused")
+    private void key(long id, String s, InlineKeyboardMarkup inlineKeyboardMarkup) {
 
         if (s == null)
             return;
-        if (s == "")
+        if (s.isEmpty())
             return;
         if (s.length() > 4000) {
             key(id, s.substring(0, 4000), inlineKeyboardMarkup);
@@ -306,11 +307,11 @@ public class TheBot extends TelegramLongPollingBot {
         }
     }
 
-    public void rkey(long id, String s, ReplyKeyboardRemove markup) {
+    private void rkey(long id, String s, ReplyKeyboardRemove markup) {
 
         if (s == null)
             return;
-        if (s == "")
+        if (s.isEmpty())
             return;
         if (s.length() > 4000) {
             rkey(id, s.substring(0, 4000), markup);
@@ -324,7 +325,7 @@ public class TheBot extends TelegramLongPollingBot {
         }
     }
 
-    void update() {
+    private void update() {
         if(notify)send(ADMIN,"UPDATE!");
         ArrayList<Eintrag> plan = getPlan();
         if (plan == null) {
@@ -343,7 +344,7 @@ public class TheBot extends TelegramLongPollingBot {
         }
     }
 
-    void allon(long id) {
+    private void allon(long id) {
         for (Eintrag e : getPlan()) {
             {
                 send(id, e.toString());
@@ -364,18 +365,19 @@ public class TheBot extends TelegramLongPollingBot {
     }
 
     private ArrayList<Eintrag> getPlan() {
-        ArrayList<Eintrag> out = new ArrayList<Eintrag>();
+        @NotNull
+        ArrayList<Eintrag> out = new ArrayList<>();
         String url = getPlanUrl();
-        if (url == null || url == "") {
+        if (url == null || url.equals("")) {
             LOG.error("URL ist leer");
-            return null;
+            return out;
         }
 
         Document doc = Jsoup.parse(Main.connect("https://lgsit.de/plan/vertretungsplan/" + url, uname, pw));
         Elements elements = doc.getElementsByTag("tbody");
         if (elements.isEmpty()) {
             LOG.error("Keine Elemente");
-            return null;
+            return out;
         }
         Elements eintraege = elements.get(0).getElementsByTag("tr");
         for (Element ein : eintraege) {
@@ -400,22 +402,22 @@ public class TheBot extends TelegramLongPollingBot {
         return elements.get(0).attr("href");
     }
 
-    public void close() {
+    private void close() {
         t.cancel();
         db.close();
     }
 
-    public void addUser(Long chatId) {
+    private void addUser(Long chatId) {
 
         LOG.info(chatId + " hinzugefügt.");
         map.add(chatId);
     }
 
-    public boolean isuser(Long chatId) {
+    private boolean isuser(Long chatId) {
         return (map.contains(chatId));
     }
 
-    public void removeUser(Long chatId) {
+    private void removeUser(Long chatId) {
         map.remove(map.indexOf(chatId));
     }
 
