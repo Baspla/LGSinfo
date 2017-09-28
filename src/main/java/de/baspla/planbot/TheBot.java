@@ -98,10 +98,8 @@ public class TheBot extends TelegramLongPollingBot {
                 return;
             }
             String txt = update.getMessage().getText();
-            if(update.getMessage().isGroupMessage()||update.getMessage().isGroupMessage()){
-                if(update.getMessage().getText().toLowerCase().endsWith("@lgsbot")){
-                    txt = update.getMessage().getText().toLowerCase().replace("@lgsbot","");
-                }
+            if(update.getMessage().isGroupMessage()||update.getMessage().isSuperGroupMessage()){
+                    txt = update.getMessage().getText().replace("@LGSBot","");
             }
             if (txt.equalsIgnoreCase("/moin")) {
                 if (isuser(update.getMessage().getChatId())) {
