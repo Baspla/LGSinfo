@@ -1,4 +1,5 @@
-<h1>Telegram-Bot fuer den Vertretungsplan der 12GD</h1>
-<h3><span style="text-decoration: underline;"><em>Status:</em></span></h3>
-<p>&nbsp;</p>
-<p><a href="http://gitlab.lgsit.de/bots/VertretungsplanBot/commits/master"><img src="http://gitlab.lgsit.de/bots/VertretungsplanBot/badges/master/build.svg" alt="build status" /></a>&nbsp;</p>
+<h1>Telegram-Bot fuer den Vertretungsplan</h1>
+
+Dieser Bot erforderte gegenüber der alten Version einen Nutzernamen mit Passwort und war nur ausgewählten Mitschülern zugänglich.
+
+Dieses Programm wurde noch in meiner Schulzeit erstellt.
